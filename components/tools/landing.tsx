@@ -1,13 +1,23 @@
-"use client"
+"use client";
 
-import { Code2, Palette, Sparkles, Shapes, Blend, ArrowRight, Wind, Activity } from "lucide-react"
-import { cn } from "@/lib/utils"
+import {
+  Code2,
+  Palette,
+  Sparkles,
+  Shapes,
+  Blend,
+  ArrowRight,
+  Wind,
+  Activity,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const tools = [
   {
     id: "code",
     label: "Code Beautifier",
-    description: "Paste your code, pick a theme and background, export a gorgeous image.",
+    description:
+      "Paste your code, pick a theme and background, export a gorgeous image.",
     icon: Code2,
     colorClass: "text-tool-code",
     bgStyle: { backgroundColor: "oklch(0.55 0.22 160 / 0.08)" },
@@ -17,7 +27,8 @@ const tools = [
   {
     id: "palette",
     label: "Color Palette",
-    description: "Generate harmonious palettes, lock swatches, add your own colors, export CSS.",
+    description:
+      "Generate harmonious palettes, lock swatches, add your own colors, export CSS.",
     icon: Palette,
     colorClass: "text-tool-palette",
     bgStyle: { backgroundColor: "oklch(0.60 0.22 25 / 0.08)" },
@@ -27,7 +38,8 @@ const tools = [
   {
     id: "icon",
     label: "Icon Creator",
-    description: "Browse 500+ icons, apply gradient backgrounds, download as SVG or PNG.",
+    description:
+      "Browse 500+ icons, apply gradient backgrounds, download as SVG or PNG.",
     icon: Sparkles,
     colorClass: "text-tool-icon",
     bgStyle: { backgroundColor: "oklch(0.55 0.22 230 / 0.08)" },
@@ -37,7 +49,8 @@ const tools = [
   {
     id: "svg",
     label: "SVG Patterns",
-    description: "Generate tiling SVG patterns — dots, grids, waves, hexagons — and copy CSS.",
+    description:
+      "Generate tiling SVG patterns — dots, grids, waves, hexagons — and copy CSS.",
     icon: Shapes,
     colorClass: "text-tool-svg",
     bgStyle: { backgroundColor: "oklch(0.62 0.20 55 / 0.08)" },
@@ -47,7 +60,8 @@ const tools = [
   {
     id: "gradient",
     label: "Gradient Builder",
-    description: "Build linear, radial, and conic gradients visually. Add blur. Copy CSS or export.",
+    description:
+      "Build linear, radial, and conic gradients visually. Add blur. Copy CSS or export.",
     icon: Blend,
     colorClass: "text-tool-gradient",
     bgStyle: { backgroundColor: "oklch(0.58 0.28 295 / 0.08)" },
@@ -57,7 +71,8 @@ const tools = [
   {
     id: "noise",
     label: "Noise & Mesh",
-    description: "Generate abstract noise textures, mesh gradients, fluid blobs, and organic backgrounds.",
+    description:
+      "Generate abstract noise textures, mesh gradients, fluid blobs, and organic backgrounds.",
     icon: Wind,
     colorClass: "text-violet-600",
     bgStyle: { backgroundColor: "oklch(0.58 0.28 295 / 0.07)" },
@@ -67,25 +82,32 @@ const tools = [
   {
     id: "wavy",
     label: "Wavy Lines",
-    description: "Create flowing sine waves, ripples, coils, and oscillating line art in SVG.",
+    description:
+      "Create flowing sine waves, ripples, coils, and oscillating line art in SVG.",
     icon: Activity,
     colorClass: "text-sky-600",
     bgStyle: { backgroundColor: "oklch(0.55 0.22 230 / 0.07)" },
     borderStyle: { borderColor: "oklch(0.55 0.22 230 / 0.20)" },
     dotStyle: { backgroundColor: "oklch(0.52 0.22 230)" },
   },
-] as const
+] as const;
 
-type ToolId = "code" | "palette" | "icon" | "svg" | "gradient" | "noise" | "wavy"
+type ToolId =
+  | "code"
+  | "palette"
+  | "icon"
+  | "svg"
+  | "gradient"
+  | "noise"
+  | "wavy";
 
 interface LandingProps {
-  onSelect: (id: ToolId) => void
+  onSelect: (id: ToolId) => void;
 }
 
 export function Landing({ onSelect }: LandingProps) {
   return (
     <div className="relative flex flex-col gap-14 py-4 max-w-4xl mx-auto overflow-hidden">
-
       {/* Decorative blobs — behind everything */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         {/* Top-right violet blob */}
@@ -105,57 +127,66 @@ export function Landing({ onSelect }: LandingProps) {
         />
       </div>
 
-        {/* Headline */}
-        <div className="flex flex-col gap-4">
-          <h1 className="text-5xl lg:text-6xl font-bold tracking-tight text-foreground text-balance leading-[1.08]">
-            Tools For{" "}
-            <span
-              style={{
-                background: "linear-gradient(135deg, oklch(0.58 0.28 295), oklch(0.55 0.22 230))",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Designers
-            </span>
-            {" "}&amp;{" "}
-            <span
-              style={{
-                background: "linear-gradient(135deg, oklch(0.55 0.22 160), oklch(0.62 0.20 55))",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Developers.
-            </span>
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-xl leading-relaxed text-pretty">
-            A collection of creative design tools for Designers and Developers to make things look cooler!
-          </p>
-        </div>
-
-        {/* CTA row */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <button
-            onClick={() => onSelect("palette")}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm text-white shadow-md transition-all hover:opacity-90 hover:-translate-y-px active:translate-y-0"
-            style={{ background: "linear-gradient(135deg, oklch(0.58 0.28 295), oklch(0.55 0.22 230))" }}
+      {/* Headline */}
+      <div className="flex flex-col gap-4">
+        <h1 className="text-5xl lg:text-6xl font-bold tracking-tight text-foreground text-balance leading-[1.08]">
+          Tools For{" "}
+          <span
+            style={{
+              background:
+                "linear-gradient(135deg, oklch(0.58 0.28 295), oklch(0.55 0.22 230))",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
           >
-            Start creating
-            <ArrowRight className="w-4 h-4" />
-          </button>
-          <span className="text-muted-foreground text-sm">or pick a tool below</span>
-        </div>
+            Designers
+          </span>{" "}
+          &amp;{" "}
+          <span
+            style={{
+              background:
+                "linear-gradient(135deg, oklch(0.55 0.22 160), oklch(0.62 0.20 55))",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            Developers.
+          </span>
+        </h1>
+        <p className="text-lg text-muted-foreground max-w-xl leading-relaxed text-pretty">
+          A collection of creative design tools for Designers and Developers to
+          make things look cooler!
+        </p>
+      </div>
+
+      {/* CTA row */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <button
+          onClick={() => onSelect("palette")}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm text-white shadow-md transition-all hover:opacity-90 hover:-translate-y-px active:translate-y-0"
+          style={{
+            background:
+              "linear-gradient(135deg, oklch(0.58 0.28 295), oklch(0.55 0.22 230))",
+          }}
+        >
+          Start creating
+          <ArrowRight className="w-4 h-4" />
+        </button>
+        <span className="text-muted-foreground text-sm">
+          or pick a tool below
+        </span>
       </div>
 
       {/* Tool cards grid */}
       <div className="flex flex-col gap-4">
-        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Tools</h2>
+        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
+          Tools
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {tools.map((tool) => {
-            const Icon = tool.icon
+            const Icon = tool.icon;
             return (
               <button
                 key={tool.id}
@@ -173,31 +204,45 @@ export function Landing({ onSelect }: LandingProps) {
                 {/* Text */}
                 <div className="flex flex-col gap-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-foreground text-sm">{tool.label}</span>
-                    <ArrowRight className={cn("w-3.5 h-3.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all", tool.colorClass)} />
+                    <span className="font-semibold text-foreground text-sm">
+                      {tool.label}
+                    </span>
+                    <ArrowRight
+                      className={cn(
+                        "w-3.5 h-3.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all",
+                        tool.colorClass,
+                      )}
+                    />
                   </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed text-pretty">{tool.description}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed text-pretty">
+                    {tool.description}
+                  </p>
                 </div>
 
                 {/* Bottom color bar */}
-                <div className="h-0.5 w-0 group-hover:w-full rounded-full transition-all duration-300" style={tool.dotStyle} />
+                <div
+                  className="h-0.5 w-0 group-hover:w-full rounded-full transition-all duration-300"
+                  style={tool.dotStyle}
+                />
               </button>
-            )
+            );
           })}
         </div>
       </div>
 
       {/* Stats strip */}
       <div className="flex items-center gap-10 flex-wrap border-t border-border pt-8 pb-4">
-        {[
-          { value: "Built By", label: "Bitrates" },
-        ].map((stat, i) => (
+        {[{ value: "Built By", label: "Bitrates" }].map((stat, i) => (
           <div key={i} className="flex flex-col gap-0.5">
-            <span className="text-2xl font-bold text-foreground">{stat.value}</span>
-            <span className="text-xs text-muted-foreground uppercase tracking-wider">{stat.label}</span>
+            <span className="text-2xl font-bold text-foreground">
+              {stat.value}
+            </span>
+            <span className="text-xs text-muted-foreground uppercase tracking-wider">
+              {stat.label}
+            </span>
           </div>
         ))}
       </div>
     </div>
-  )
+  );
 }
