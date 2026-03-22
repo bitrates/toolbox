@@ -105,23 +105,6 @@ export function Landing({ onSelect }: LandingProps) {
         />
       </div>
 
-      {/* Hero */}
-      <div className="flex flex-col gap-6 pt-8">
-        {/* Badge */}
-        <div className="flex items-center gap-2 w-fit">
-          <span
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tracking-wide border"
-            style={{
-              background: "oklch(0.58 0.28 295 / 0.08)",
-              borderColor: "oklch(0.58 0.28 295 / 0.25)",
-              color: "oklch(0.50 0.28 295)",
-            }}
-          >
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: "oklch(0.58 0.28 295)" }} />
-            Made By Bitrate
-          </span>
-        </div>
-
         {/* Headline */}
         <div className="flex flex-col gap-4">
           <h1 className="text-5xl lg:text-6xl font-bold tracking-tight text-foreground text-balance leading-[1.08]">

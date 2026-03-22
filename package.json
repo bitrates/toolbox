@@ -1,6 +1,6 @@
 {
-  "name": "The Toolbox",
-  "version": "1.0.0",
+  "name": "the-toolbox",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",

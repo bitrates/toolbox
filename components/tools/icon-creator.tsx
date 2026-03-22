@@ -1,32 +1,117 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import type { IconDefinition } from "@fortawesome/fontawesome-svg-core"
+// i have to find a better way to import all the Font Awesome icons
+
+import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
-  faCode, faTerminal, faDatabase, faServer, faMicrochip, faWifi, faCloud, faGlobe,
-  faBug, faGear, faGears, faRobot, faLaptop, faMobileScreen, faDesktop, faKeyboard,
-  faPalette, faPen, faPencil, faRuler, faPaintbrush, faFillDrip, faEraser, faShapes,
-  faLayerGroup, faImage, faIcons, faCropSimple,
-  faPlay, faMusic, faHeadphones, faMicrophone, faCamera, faFilm, faVideo,
-  faSun, faMoon, faStar, faLeaf, faTree, faSeedling, faFire, faBolt, faSnowflake,
-  faRainbow, faCloudRain,
-  faToolbox, faWrench, faHammer, faLock, faKey, faShieldHalved, faBell,
-  faBookmark, faTag, faPaperPlane, faEnvelope, faPhone, faMapPin, faCompass,
-  faHeart, faTrophy, faMedal, faCrown, faGift, faRocket, faGem, faGamepad,
-  faDice, faThumbsUp, faFaceSmile,
-  faAtom, faDna, faMicroscope, faFlask, faStethoscope, faBrain, faEye,
-  faCar, faPlane, faBicycle, faShip, faTrain,
-  faHouse, faBuilding, faSchool, faStore, faHospital,
-  faChartBar, faChartPie, faChartLine, faTable, faMagnifyingGlass,
-  faShareNodes, faLink, faQrcode, faDownload, faUpload, faFileCode,
-} from "@fortawesome/free-solid-svg-icons"
-import { Download, Copy, Check, ChevronDown } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
+  faCode,
+  faTerminal,
+  faDatabase,
+  faServer,
+  faMicrochip,
+  faWifi,
+  faCloud,
+  faGlobe,
+  faBug,
+  faGear,
+  faGears,
+  faRobot,
+  faLaptop,
+  faMobileScreen,
+  faDesktop,
+  faKeyboard,
+  faPalette,
+  faPen,
+  faPencil,
+  faRuler,
+  faPaintbrush,
+  faFillDrip,
+  faEraser,
+  faShapes,
+  faLayerGroup,
+  faImage,
+  faIcons,
+  faCropSimple,
+  faPlay,
+  faMusic,
+  faHeadphones,
+  faMicrophone,
+  faCamera,
+  faFilm,
+  faVideo,
+  faSun,
+  faMoon,
+  faStar,
+  faLeaf,
+  faTree,
+  faSeedling,
+  faFire,
+  faBolt,
+  faSnowflake,
+  faRainbow,
+  faCloudRain,
+  faToolbox,
+  faWrench,
+  faHammer,
+  faLock,
+  faKey,
+  faShieldHalved,
+  faBell,
+  faBookmark,
+  faTag,
+  faPaperPlane,
+  faEnvelope,
+  faPhone,
+  faMapPin,
+  faCompass,
+  faHeart,
+  faTrophy,
+  faMedal,
+  faCrown,
+  faGift,
+  faRocket,
+  faGem,
+  faGamepad,
+  faDice,
+  faThumbsUp,
+  faFaceSmile,
+  faAtom,
+  faDna,
+  faMicroscope,
+  faFlask,
+  faStethoscope,
+  faBrain,
+  faEye,
+  faCar,
+  faPlane,
+  faBicycle,
+  faShip,
+  faTrain,
+  faHouse,
+  faBuilding,
+  faSchool,
+  faStore,
+  faHospital,
+  faChartBar,
+  faChartPie,
+  faChartLine,
+  faTable,
+  faMagnifyingGlass,
+  faShareNodes,
+  faLink,
+  faQrcode,
+  faDownload,
+  faUpload,
+  faFileCode,
+} from "@fortawesome/free-solid-svg-icons";
+import { Download, Copy, Check, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
-type FAIcon = { name: string; icon: IconDefinition }
+type FAIcon = { name: string; icon: IconDefinition };
 
 const FA_ICONS: FAIcon[] = [
   // Tech & Dev
@@ -137,7 +222,7 @@ const FA_ICONS: FAIcon[] = [
   { name: "Line Chart", icon: faChartLine },
   { name: "Table", icon: faTable },
   { name: "Search", icon: faMagnifyingGlass },
-]
+];
 
 const GRADIENTS = [
   { id: "green-teal", label: "Toolbox", from: "#7ed957", to: "#0d9488" },
@@ -148,44 +233,49 @@ const GRADIENTS = [
   { id: "emerald-teal", label: "Emerald", from: "#10b981", to: "#0d9488" },
   { id: "fuchsia", label: "Fuchsia", from: "#d946ef", to: "#9333ea" },
   { id: "slate", label: "Slate", from: "#475569", to: "#1e293b" },
-]
+];
 
 const BG_SHAPES = [
   { id: "rounded-2xl", label: "Rounded" },
   { id: "rounded-full", label: "Circle" },
   { id: "rounded-none", label: "Square" },
-]
+];
 
-const SIZES = [64, 96, 128, 192]
+const SIZES = [64, 96, 128, 192];
 
 export function IconCreator() {
-  const [search, setSearch] = useState("")
-  const [selected, setSelected] = useState<FAIcon>(FA_ICONS[0])
-  const [gradient, setGradient] = useState(GRADIENTS[0])
-  const [bgShape, setBgShape] = useState("rounded-2xl")
-  const [iconSize, setIconSize] = useState(96)
-  const [iconColor, setIconColor] = useState("#ffffff")
-  const [copied, setCopied] = useState(false)
-  const [exportOpen, setExportOpen] = useState(false)
+  const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState<FAIcon>(FA_ICONS[0]);
+  const [gradient, setGradient] = useState(GRADIENTS[0]);
+  const [bgShape, setBgShape] = useState("rounded-2xl");
+  const [iconSize, setIconSize] = useState(96);
+  const [iconColor, setIconColor] = useState("#ffffff");
+  const [copied, setCopied] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
 
   const filtered = FA_ICONS.filter((ic) =>
-    ic.name.toLowerCase().includes(search.toLowerCase())
-  )
+    ic.name.toLowerCase().includes(search.toLowerCase()),
+  );
 
-  const containerSize = Math.round(iconSize * 1.6)
-  const iconRenderSize = Math.round(iconSize * 0.5)
-  const rx = bgShape === "rounded-full" ? containerSize / 2
-    : bgShape === "rounded-none" ? 0
-      : bgShape === "rounded-2xl" ? 24 : 16
+  const containerSize = Math.round(iconSize * 1.6);
+  const iconRenderSize = Math.round(iconSize * 0.5);
+  const rx =
+    bgShape === "rounded-full"
+      ? containerSize / 2
+      : bgShape === "rounded-none"
+        ? 0
+        : bgShape === "rounded-2xl"
+          ? 24
+          : 16;
 
   const buildSvgString = () => {
     // Build an SVG from the icon's path data directly
-    const iconDef = selected.icon
-    const [w, h, , , pathData] = iconDef.icon
-    const path = Array.isArray(pathData) ? pathData.join(" ") : pathData
-    const pad = Math.round(containerSize * 0.22)
-    const iconW = containerSize - pad * 2
-    const iconH = containerSize - pad * 2
+    const iconDef = selected.icon;
+    const [w, h, , , pathData] = iconDef.icon;
+    const path = Array.isArray(pathData) ? pathData.join(" ") : pathData;
+    const pad = Math.round(containerSize * 0.22);
+    const iconW = containerSize - pad * 2;
+    const iconH = containerSize - pad * 2;
     return `<svg xmlns="http://www.w3.org/2000/svg" width="${containerSize}" height="${containerSize}" viewBox="0 0 ${containerSize} ${containerSize}">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -199,73 +289,100 @@ export function IconCreator() {
       <path d="${path}" fill="${iconColor}"/>
     </svg>
   </g>
-</svg>`
-  }
+</svg>`;
+  };
 
   const handleCopySvg = async () => {
-    await navigator.clipboard.writeText(buildSvgString())
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1500)
-  }
+    await navigator.clipboard.writeText(buildSvgString());
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
 
   const exportAsSvg = () => {
-    const blob = new Blob([buildSvgString()], { type: "image/svg+xml" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `icon-${selected.name.toLowerCase().replace(/\s+/g, "-")}.svg`
-    a.click()
-    URL.revokeObjectURL(url)
-    setExportOpen(false)
-  }
+    const blob = new Blob([buildSvgString()], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `icon-${selected.name.toLowerCase().replace(/\s+/g, "-")}.svg`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setExportOpen(false);
+  };
 
   const exportAsPng = () => {
-    const svgStr = buildSvgString()
-    const img = new Image()
-    img.crossOrigin = "anonymous"
+    const svgStr = buildSvgString();
+    const img = new Image();
+    img.crossOrigin = "anonymous";
     img.onload = () => {
-      const canvas = document.createElement("canvas")
-      canvas.width = containerSize * 2
-      canvas.height = containerSize * 2
-      const ctx = canvas.getContext("2d")!
-      ctx.scale(2, 2)
-      ctx.drawImage(img, 0, 0)
+      const canvas = document.createElement("canvas");
+      canvas.width = containerSize * 2;
+      canvas.height = containerSize * 2;
+      const ctx = canvas.getContext("2d")!;
+      ctx.scale(2, 2);
+      ctx.drawImage(img, 0, 0);
       canvas.toBlob((blob) => {
-        if (!blob) return
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = url
-        a.download = `icon-${selected.name.toLowerCase().replace(/\s+/g, "-")}.png`
-        a.click()
-        URL.revokeObjectURL(url)
-      })
-    }
-    img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}`
-    setExportOpen(false)
-  }
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `icon-${selected.name.toLowerCase().replace(/\s+/g, "-")}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    };
+    img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}`;
+    setExportOpen(false);
+  };
 
   return (
     <div className="flex flex-col gap-6 h-full">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-foreground">Icon Creator</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Pick an icon, style it, and export as PNG or SVG</p>
+          <h1 className="text-xl font-semibold text-foreground">
+            Icon Creator
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Pick an icon, style it, and export as PNG or SVG
+          </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleCopySvg} className="gap-2">
-            {copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleCopySvg}
+            className="gap-2"
+          >
+            {copied ? (
+              <Check className="w-3.5 h-3.5 text-primary" />
+            ) : (
+              <Copy className="w-3.5 h-3.5" />
+            )}
             {copied ? "Copied!" : "Copy SVG"}
           </Button>
           <div className="relative">
-            <Button size="sm" onClick={() => setExportOpen((o) => !o)} className="gap-1.5 bg-tool-icon text-white hover:bg-tool-icon/90">
+            <Button
+              size="sm"
+              onClick={() => setExportOpen((o) => !o)}
+              className="gap-1.5 bg-tool-icon text-white hover:bg-tool-icon/90"
+            >
               <Download className="w-3.5 h-3.5" />
               Export
               <ChevronDown className="w-3 h-3" />
             </Button>
             {exportOpen && (
               <div className="absolute right-0 top-full mt-1 w-36 bg-card border border-border rounded-lg shadow-lg z-50 overflow-hidden">
-                <button onClick={exportAsPng} className="w-full px-4 py-2.5 text-sm text-left hover:bg-accent transition-colors font-medium">Export PNG</button>
-                <button onClick={exportAsSvg} className="w-full px-4 py-2.5 text-sm text-left hover:bg-accent transition-colors font-medium">Export SVG</button>
+                <button
+                  onClick={exportAsPng}
+                  className="w-full px-4 py-2.5 text-sm text-left hover:bg-accent transition-colors font-medium"
+                >
+                  Export PNG
+                </button>
+                <button
+                  onClick={exportAsSvg}
+                  className="w-full px-4 py-2.5 text-sm text-left hover:bg-accent transition-colors font-medium"
+                >
+                  Export SVG
+                </button>
               </div>
             )}
           </div>
@@ -277,7 +394,9 @@ export function IconCreator() {
         <div className="flex flex-col gap-5 w-56 shrink-0 overflow-y-auto pr-1">
           {/* Gradient */}
           <div className="flex flex-col gap-2">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Gradient</label>
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Gradient
+            </label>
             <div className="grid grid-cols-4 gap-1.5">
               {GRADIENTS.map((g) => (
                 <button
@@ -288,9 +407,11 @@ export function IconCreator() {
                     "h-8 rounded-lg transition-all",
                     gradient.id === g.id
                       ? "ring-2 ring-foreground ring-offset-1 ring-offset-background scale-105"
-                      : "opacity-60 hover:opacity-100"
+                      : "opacity-60 hover:opacity-100",
                   )}
-                  style={{ background: `linear-gradient(135deg, ${g.from}, ${g.to})` }}
+                  style={{
+                    background: `linear-gradient(135deg, ${g.from}, ${g.to})`,
+                  }}
                 />
               ))}
             </div>
@@ -298,7 +419,9 @@ export function IconCreator() {
 
           {/* Shape */}
           <div className="flex flex-col gap-2">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Shape</label>
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Shape
+            </label>
             <div className="grid grid-cols-4 gap-1.5">
               {BG_SHAPES.map((shape) => (
                 <button
@@ -310,14 +433,18 @@ export function IconCreator() {
                     shape.id,
                     bgShape === shape.id
                       ? "bg-primary/10 border-primary/50 text-foreground"
-                      : "bg-secondary border-border text-muted-foreground hover:bg-accent"
+                      : "bg-secondary border-border text-muted-foreground hover:bg-accent",
                   )}
                 >
-                  <span className={cn(
-                    "w-4 h-4 block",
-                    shape.id,
-                    bgShape === shape.id ? "bg-primary" : "bg-muted-foreground/40"
-                  )} />
+                  <span
+                    className={cn(
+                      "w-4 h-4 block",
+                      shape.id,
+                      bgShape === shape.id
+                        ? "bg-primary"
+                        : "bg-muted-foreground/40",
+                    )}
+                  />
                 </button>
               ))}
             </div>
@@ -325,7 +452,9 @@ export function IconCreator() {
 
           {/* Size */}
           <div className="flex flex-col gap-2">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Size</label>
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Size
+            </label>
             <div className="flex gap-1">
               {SIZES.map((s) => (
                 <button
@@ -335,7 +464,7 @@ export function IconCreator() {
                     "flex-1 py-1.5 rounded-md text-xs font-mono transition-all border",
                     iconSize === s
                       ? "bg-primary/10 text-primary border-primary/40"
-                      : "bg-secondary text-muted-foreground hover:bg-accent border-transparent"
+                      : "bg-secondary text-muted-foreground hover:bg-accent border-transparent",
                   )}
                 >
                   {s}
@@ -346,7 +475,9 @@ export function IconCreator() {
 
           {/* Icon color */}
           <div className="flex flex-col gap-2">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Icon Color</label>
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Icon Color
+            </label>
             <div className="flex items-center gap-2">
               <label className="w-9 h-9 rounded-lg border border-border cursor-pointer overflow-hidden shrink-0 block relative">
                 <input
@@ -354,11 +485,21 @@ export function IconCreator() {
                   value={iconColor}
                   onChange={(e) => setIconColor(e.target.value)}
                   className="absolute opacity-0 cursor-pointer"
-                  style={{ width: "200%", height: "200%", top: "-50%", left: "-50%" }}
+                  style={{
+                    width: "200%",
+                    height: "200%",
+                    top: "-50%",
+                    left: "-50%",
+                  }}
                 />
-                <span className="block w-full h-full" style={{ background: iconColor }} />
+                <span
+                  className="block w-full h-full"
+                  style={{ background: iconColor }}
+                />
               </label>
-              <span className="font-mono text-sm text-muted-foreground">{iconColor.toUpperCase()}</span>
+              <span className="font-mono text-sm text-muted-foreground">
+                {iconColor.toUpperCase()}
+              </span>
             </div>
           </div>
         </div>
@@ -366,7 +507,10 @@ export function IconCreator() {
         {/* Preview */}
         <div className="flex-1 flex flex-col items-center justify-center gap-4 rounded-xl bg-secondary/50 border border-border">
           <div
-            className={cn("flex items-center justify-center shadow-2xl transition-all", bgShape)}
+            className={cn(
+              "flex items-center justify-center shadow-2xl transition-all",
+              bgShape,
+            )}
             style={{
               width: containerSize,
               height: containerSize,
@@ -375,10 +519,16 @@ export function IconCreator() {
           >
             <FontAwesomeIcon
               icon={selected.icon}
-              style={{ width: iconRenderSize, height: iconRenderSize, color: iconColor }}
+              style={{
+                width: iconRenderSize,
+                height: iconRenderSize,
+                color: iconColor,
+              }}
             />
           </div>
-          <p className="text-xs text-muted-foreground font-mono">{selected.name}</p>
+          <p className="text-xs text-muted-foreground font-mono">
+            {selected.name}
+          </p>
         </div>
 
         {/* Icon Picker */}
@@ -399,7 +549,7 @@ export function IconCreator() {
                   "flex items-center justify-center w-full aspect-square rounded-lg transition-all border",
                   selected.name === ic.name
                     ? "bg-primary/10 text-primary border-primary/40"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground border-transparent"
+                    : "text-muted-foreground hover:bg-accent hover:text-foreground border-transparent",
                 )}
               >
                 <FontAwesomeIcon icon={ic.icon} className="w-4 h-4" />
@@ -409,5 +559,5 @@ export function IconCreator() {
         </div>
       </div>
     </div>
-  )
+  );
 }
