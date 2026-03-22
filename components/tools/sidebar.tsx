@@ -1,82 +1,35 @@
 "use client"
 
-import { Code2, Palette, Sparkles, Shapes, Blend, Home, Wind, Waves, Activity } from "lucide-react"
+import { useState } from "react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import {
+  faToolbox, faHouse, faCode, faPalette, faIcons, faShapes,
+  faCircleHalfStroke, faWind, faWaveSquare,
+  faChevronLeft, faChevronRight,
+} from "@fortawesome/free-solid-svg-icons"
 import { cn } from "@/lib/utils"
 
 export type ToolId = "home" | "code" | "palette" | "icon" | "svg" | "gradient" | "noise" | "wavy"
 
-const navItems: {
+interface NavItem {
   id: ToolId
   label: string
-  icon: React.ElementType
+  icon: typeof faHouse
   activeColor: string
   dotClass?: string
-  section?: "home" | "tools"
-}[] = [
-    {
-      id: "home",
-      label: "Home",
-      icon: Home,
-      activeColor: "text-primary",
-      section: "home",
-    },
-    {
-      id: "code",
-      label: "Code Beautifier",
-      icon: Code2,
-      activeColor: "text-tool-code",
-      dotClass: "bg-tool-code",
-      section: "tools",
-    },
-    {
-      id: "palette",
-      label: "Color Palette",
-      icon: Palette,
-      activeColor: "text-tool-palette",
-      dotClass: "bg-tool-palette",
-      section: "tools",
-    },
-    {
-      id: "icon",
-      label: "Icon Creator",
-      icon: Sparkles,
-      activeColor: "text-tool-icon",
-      dotClass: "bg-tool-icon",
-      section: "tools",
-    },
-    {
-      id: "svg",
-      label: "SVG Patterns",
-      icon: Shapes,
-      activeColor: "text-tool-svg",
-      dotClass: "bg-tool-svg",
-      section: "tools",
-    },
-    {
-      id: "gradient",
-      label: "Gradient Builder",
-      icon: Blend,
-      activeColor: "text-tool-gradient",
-      dotClass: "bg-tool-gradient",
-      section: "tools",
-    },
-    {
-      id: "noise",
-      label: "Noise & Mesh",
-      icon: Wind,
-      activeColor: "text-violet-600",
-      dotClass: "bg-violet-500",
-      section: "tools",
-    },
-    {
-      id: "wavy",
-      label: "Wavy Lines",
-      icon: Activity,
-      activeColor: "text-sky-600",
-      dotClass: "bg-sky-500",
-      section: "tools",
-    },
-  ]
+  section: "home" | "tools"
+}
+
+const navItems: NavItem[] = [
+  { id: "home",     label: "Home",             icon: faHouse,             activeColor: "text-primary",      section: "home"  },
+  { id: "code",     label: "Code Beautifier",  icon: faCode,              activeColor: "text-tool-code",    dotClass: "bg-tool-code",     section: "tools" },
+  { id: "palette",  label: "Color Palette",    icon: faPalette,           activeColor: "text-tool-palette", dotClass: "bg-tool-palette",  section: "tools" },
+  { id: "icon",     label: "Icon Creator",     icon: faIcons,             activeColor: "text-tool-icon",    dotClass: "bg-tool-icon",     section: "tools" },
+  { id: "svg",      label: "SVG Patterns",     icon: faShapes,            activeColor: "text-tool-svg",     dotClass: "bg-tool-svg",      section: "tools" },
+  { id: "gradient", label: "Gradient Builder", icon: faCircleHalfStroke,  activeColor: "text-tool-gradient",dotClass: "bg-tool-gradient", section: "tools" },
+  { id: "noise",    label: "Noise & Mesh",     icon: faWind,              activeColor: "text-violet-600",   dotClass: "bg-violet-500",    section: "tools" },
+  { id: "wavy",     label: "Wavy Lines",       icon: faWaveSquare,        activeColor: "text-sky-600",      dotClass: "bg-sky-500",       section: "tools" },
+]
 
 interface SidebarProps {
   active: ToolId
@@ -84,65 +37,114 @@ interface SidebarProps {
 }
 
 export function AppSidebar({ active, onChange }: SidebarProps) {
-  const homeItem = navItems.filter((n) => n.section === "home")
+  const [collapsed, setCollapsed] = useState(false)
+
+  const homeItems = navItems.filter((n) => n.section === "home")
   const toolItems = navItems.filter((n) => n.section === "tools")
 
   return (
-    <aside className="flex flex-col w-64 shrink-0 h-screen bg-sidebar border-r border-border">
-      {/* Logo */}
-      <button
-        onClick={() => onChange("home")}
-        className="flex items-center gap-3 px-5 py-5 border-b border-border hover:opacity-80 transition-opacity"
-      >
-        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary shrink-0">
-          <Blend className="w-4 h-4 text-primary-foreground" />
-        </div>
-        <span className="font-semibold text-foreground tracking-tight text-base">Toolbox</span>
-      </button>
+    <aside
+      className={cn(
+        "flex flex-col h-screen bg-sidebar border-r border-border transition-all duration-300 shrink-0",
+        collapsed ? "w-16" : "w-64"
+      )}
+    >
+      {/* Header row: logo + collapse toggle */}
+      <div className={cn(
+        "flex items-center border-b border-border shrink-0",
+        collapsed ? "flex-col gap-2 py-4 px-0" : "px-4 py-4 gap-3"
+      )}>
+        <button
+          onClick={() => onChange("home")}
+          className={cn(
+            "flex items-center gap-3 hover:opacity-80 transition-opacity flex-1 min-w-0",
+            collapsed && "justify-center flex-none"
+          )}
+        >
+          <FontAwesomeIcon
+            icon={faToolbox}
+            className="w-5 h-5 shrink-0"
+            style={{ color: "rgb(126, 217, 87)" }}
+          />
+          {!collapsed && (
+            <span className="font-semibold text-foreground tracking-tight text-base whitespace-nowrap truncate">
+              Toolbox
+            </span>
+          )}
+        </button>
+
+        {/* Collapse button — in header when expanded, below logo when collapsed */}
+        <button
+          onClick={() => setCollapsed((c) => !c)}
+          className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-accent transition-colors shrink-0 text-muted-foreground"
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          <FontAwesomeIcon
+            icon={collapsed ? faChevronRight : faChevronLeft}
+            className="w-3 h-3"
+          />
+        </button>
+      </div>
 
       {/* Nav */}
-      <nav className="flex flex-col gap-1 p-3 flex-1">
-        {/* Home */}
-        {homeItem.map((item) => {
-          const Icon = item.icon
+      <nav className={cn(
+        "flex flex-col gap-1 p-2 flex-1 overflow-y-auto",
+        collapsed && "items-center"
+      )}>
+        {/* Home item */}
+        {homeItems.map((item) => {
           const isActive = active === item.id
           return (
             <button
               key={item.id}
               onClick={() => onChange(item.id)}
+              title={collapsed ? item.label : undefined}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 w-full text-left",
+                "flex items-center rounded-lg text-sm font-medium transition-all duration-150 w-full",
+                collapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                 isActive
                   ? "bg-accent text-foreground"
                   : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
               )}
             >
-              <Icon className={cn("w-4 h-4 shrink-0 transition-colors", isActive ? item.activeColor : "text-muted-foreground")} />
-              <span>{item.label}</span>
+              <FontAwesomeIcon
+                icon={item.icon}
+                className={cn("w-4 h-4 shrink-0", isActive ? item.activeColor : "text-muted-foreground")}
+              />
+              {!collapsed && <span>{item.label}</span>}
             </button>
           )
         })}
 
-        {/* Tools section */}
-        <p className="text-xs font-medium text-muted-foreground px-3 pt-4 pb-1 uppercase tracking-widest">Tools</p>
+        {/* Tools label */}
+        {!collapsed
+          ? <p className="text-xs font-medium text-muted-foreground px-3 pt-4 pb-1 uppercase tracking-widest">Tools</p>
+          : <div className="w-8 h-px bg-border my-2" />
+        }
+
+        {/* Tool items */}
         {toolItems.map((item) => {
-          const Icon = item.icon
           const isActive = active === item.id
           return (
             <button
               key={item.id}
               onClick={() => onChange(item.id)}
+              title={collapsed ? item.label : undefined}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 w-full text-left",
+                "flex items-center rounded-lg text-sm font-medium transition-all duration-150 w-full",
+                collapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                 isActive
                   ? "bg-accent text-foreground"
                   : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
               )}
             >
-              <Icon className={cn("w-4 h-4 shrink-0 transition-colors", isActive ? item.activeColor : "text-muted-foreground")} />
-              <span>{item.label}</span>
-              {isActive && item.dotClass && (
-                <span className={cn("ml-auto w-1.5 h-1.5 rounded-full", item.dotClass)} />
+              <FontAwesomeIcon
+                icon={item.icon}
+                className={cn("w-4 h-4 shrink-0", isActive ? item.activeColor : "text-muted-foreground")}
+              />
+              {!collapsed && <span className="flex-1 text-left">{item.label}</span>}
+              {!collapsed && isActive && item.dotClass && (
+                <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", item.dotClass)} />
               )}
             </button>
           )
@@ -150,9 +152,11 @@ export function AppSidebar({ active, onChange }: SidebarProps) {
       </nav>
 
       {/* Footer */}
-      <div className="px-5 py-4 border-t border-border">
-        <p className="text-xs text-muted-foreground">Creative Tools By Bitrates</p>
-      </div>
+      {!collapsed && (
+        <div className="px-5 py-4 border-t border-border shrink-0">
+          <p className="text-xs text-muted-foreground">Creative Tools Collection</p>
+        </div>
+      )}
     </aside>
   )
 }

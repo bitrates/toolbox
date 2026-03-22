@@ -108,13 +108,14 @@ export function GradientGenerator() {
     const sorted = [...stops].sort((a, b) => a.position - b.position)
 
     if (type === "linear") {
-      const rad = (angle * Math.PI) / 180
+      // Match CSS linear-gradient angle convention: 0deg = bottom to top, 90deg = left to right
+      const cssRad = ((angle - 90) * Math.PI) / 180
       const cx = size / 2, cy = size / 2
-      const len = Math.sqrt(size * size + size * size) / 2
-      const x0 = cx - Math.cos(rad) * len
-      const y0 = cy - Math.sin(rad) * len
-      const x1 = cx + Math.cos(rad) * len
-      const y1 = cy + Math.sin(rad) * len
+      const len = size / 2
+      const x0 = cx - Math.cos(cssRad) * len
+      const y0 = cy - Math.sin(cssRad) * len
+      const x1 = cx + Math.cos(cssRad) * len
+      const y1 = cy + Math.sin(cssRad) * len
       const grad = ctx.createLinearGradient(x0, y0, x1, y1)
       sorted.forEach((s) => grad.addColorStop(s.position / 100, s.color))
       ctx.fillStyle = grad
@@ -155,14 +156,25 @@ export function GradientGenerator() {
 
     let gradDef = ""
     if (type === "linear") {
-      const rad = (angle * Math.PI) / 180
-      const cx = 50, cy = 50
-      const len = 70
-      const x1 = cx - Math.cos(rad) * len, y1 = cy - Math.sin(rad) * len
-      const x2 = cx + Math.cos(rad) * len, y2 = cy + Math.sin(rad) * len
-      gradDef = `<linearGradient id="g" x1="${x1}%" y1="${y1}%" x2="${x2}%" y2="${y2}%">${stopsXml}</linearGradient>`
-    } else {
+      // Convert CSS angle (0=up, clockwise) to SVG gradient vector
+      // CSS angle 0deg = top to bottom in CSS but SVG uses math angle
+      // Convert: SVG x1,y1 -> x2,y2 based on CSS angle convention
+      const cssRad = ((angle - 90) * Math.PI) / 180
+      const x1 = 50 - Math.cos(cssRad) * 50
+      const y1 = 50 - Math.sin(cssRad) * 50
+      const x2 = 50 + Math.cos(cssRad) * 50
+      const y2 = 50 + Math.sin(cssRad) * 50
+      gradDef = `<linearGradient id="g" x1="${x1.toFixed(2)}%" y1="${y1.toFixed(2)}%" x2="${x2.toFixed(2)}%" y2="${y2.toFixed(2)}%">${stopsXml}</linearGradient>`
+    } else if (type === "radial") {
       gradDef = `<radialGradient id="g" cx="50%" cy="50%" r="50%">${stopsXml}</radialGradient>`
+    } else {
+      // conic — approximate with linear for SVG since SVG conic support is limited
+      const cssRad = ((angle - 90) * Math.PI) / 180
+      const x1 = 50 - Math.cos(cssRad) * 50
+      const y1 = 50 - Math.sin(cssRad) * 50
+      const x2 = 50 + Math.cos(cssRad) * 50
+      const y2 = 50 + Math.sin(cssRad) * 50
+      gradDef = `<linearGradient id="g" x1="${x1.toFixed(2)}%" y1="${y1.toFixed(2)}%" x2="${x2.toFixed(2)}%" y2="${y2.toFixed(2)}%">${stopsXml}</linearGradient>`
     }
 
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
@@ -266,14 +278,20 @@ export function GradientGenerator() {
               </button>
             </div>
             <div className="flex flex-col gap-2">
-              {sortedStops.map((stop) => (
+              {/* Render stops in insertion order so rows never jump while dragging */}
+              {stops.map((stop) => (
                 <div key={stop.id} className="flex items-center gap-2 bg-secondary rounded-lg p-2 border border-border">
-                  <input
-                    type="color"
-                    value={stop.color}
-                    onChange={(e) => updateStop(stop.id, "color", e.target.value)}
-                    className="w-8 h-8 rounded-md border border-border cursor-pointer bg-transparent"
-                  />
+                  {/* Full-bleed color swatch — wrapper clips the native color input */}
+                  <label className="w-8 h-8 rounded-md border border-border cursor-pointer overflow-hidden shrink-0 block relative">
+                    <input
+                      type="color"
+                      value={stop.color}
+                      onChange={(e) => updateStop(stop.id, "color", e.target.value)}
+                      className="absolute inset-0 w-full h-full cursor-pointer opacity-0"
+                      style={{ width: "200%", height: "200%", top: "-50%", left: "-50%" }}
+                    />
+                    <span className="block w-full h-full" style={{ background: stop.color }} />
+                  </label>
                   <div className="flex flex-col gap-1 flex-1 min-w-0">
                     <span className="font-mono text-xs text-muted-foreground">{stop.color.toUpperCase()}</span>
                     <input type="range" min={0} max={100} value={stop.position} onChange={(e) => updateStop(stop.id, "position", Number(e.target.value))} className="w-full accent-[var(--tool-gradient)] h-1" />

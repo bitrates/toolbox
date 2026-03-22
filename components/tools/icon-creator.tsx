@@ -1,70 +1,191 @@
 "use client"
 
-import { useState, useRef } from "react"
-import * as LucideIcons from "lucide-react"
-import { Download, Copy, Check, Search, ChevronDown } from "lucide-react"
+import { useState } from "react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core"
+import {
+  faCode, faTerminal, faDatabase, faServer, faMicrochip, faWifi, faCloud, faGlobe,
+  faBug, faGear, faGears, faRobot, faLaptop, faMobileScreen, faDesktop, faKeyboard,
+  faPalette, faPen, faPencil, faRuler, faPaintbrush, faFillDrip, faEraser, faShapes,
+  faLayerGroup, faImage, faIcons, faCropSimple,
+  faPlay, faMusic, faHeadphones, faMicrophone, faCamera, faFilm, faVideo,
+  faSun, faMoon, faStar, faLeaf, faTree, faSeedling, faFire, faBolt, faSnowflake,
+  faRainbow, faCloudRain,
+  faToolbox, faWrench, faHammer, faLock, faKey, faShieldHalved, faBell,
+  faBookmark, faTag, faPaperPlane, faEnvelope, faPhone, faMapPin, faCompass,
+  faHeart, faTrophy, faMedal, faCrown, faGift, faRocket, faGem, faGamepad,
+  faDice, faThumbsUp, faFaceSmile,
+  faAtom, faDna, faMicroscope, faFlask, faStethoscope, faBrain, faEye,
+  faCar, faPlane, faBicycle, faShip, faTrain,
+  faHouse, faBuilding, faSchool, faStore, faHospital,
+  faChartBar, faChartPie, faChartLine, faTable, faMagnifyingGlass,
+  faShareNodes, faLink, faQrcode, faDownload, faUpload, faFileCode,
+} from "@fortawesome/free-solid-svg-icons"
+import { Download, Copy, Check, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
-const ICON_NAMES = [
-  "Zap", "Star", "Heart", "Flame", "Bolt", "Sun", "Moon", "Cloud", "Rainbow",
-  "Rocket", "Sparkles", "Diamond", "Crown", "Shield", "Sword", "Key", "Lock",
-  "Globe", "Map", "Compass", "Anchor", "Wave", "Leaf", "Tree", "Flower",
-  "Coffee", "Pizza", "Music", "Headphones", "Camera", "Film", "Gamepad2",
-  "Trophy", "Medal", "Gift", "Box", "Package", "Archive", "Layers",
-  "Code2", "Terminal", "Database", "Server", "Cpu", "Wifi", "Bluetooth",
-  "Monitor", "Smartphone", "Tablet", "Laptop", "Mouse", "Keyboard",
-  "Mail", "MessageCircle", "Bell", "Calendar", "Clock", "Timer",
-  "Home", "Building", "Store", "Library", "School", "Hospital",
-  "Car", "Plane", "Train", "Bike", "Bus", "Ship",
-  "Apple", "Cherry", "Grape", "Banana", "Lemon",
-  "Pencil", "Pen", "Highlighter", "Eraser", "Ruler",
-  "Microscope", "Telescope", "Atom", "Dna", "Beaker",
+type FAIcon = { name: string; icon: IconDefinition }
+
+const FA_ICONS: FAIcon[] = [
+  // Tech & Dev
+  { name: "Code", icon: faCode },
+  { name: "Terminal", icon: faTerminal },
+  { name: "Database", icon: faDatabase },
+  { name: "Server", icon: faServer },
+  { name: "Microchip", icon: faMicrochip },
+  { name: "Wifi", icon: faWifi },
+  { name: "Cloud", icon: faCloud },
+  { name: "Globe", icon: faGlobe },
+  { name: "Bug", icon: faBug },
+  { name: "Gear", icon: faGear },
+  { name: "Gears", icon: faGears },
+  { name: "Robot", icon: faRobot },
+  { name: "Laptop", icon: faLaptop },
+  { name: "Mobile", icon: faMobileScreen },
+  { name: "Desktop", icon: faDesktop },
+  { name: "Keyboard", icon: faKeyboard },
+  { name: "Download", icon: faDownload },
+  { name: "Upload", icon: faUpload },
+  { name: "File Code", icon: faFileCode },
+  { name: "QR Code", icon: faQrcode },
+  // Design & UI
+  { name: "Palette", icon: faPalette },
+  { name: "Pen", icon: faPen },
+  { name: "Pencil", icon: faPencil },
+  { name: "Ruler", icon: faRuler },
+  { name: "Paintbrush", icon: faPaintbrush },
+  { name: "Fill Drip", icon: faFillDrip },
+  { name: "Eraser", icon: faEraser },
+  { name: "Shapes", icon: faShapes },
+  { name: "Layers", icon: faLayerGroup },
+  { name: "Image", icon: faImage },
+  { name: "Icons", icon: faIcons },
+  { name: "Crop", icon: faCropSimple },
+  // Media
+  { name: "Play", icon: faPlay },
+  { name: "Music", icon: faMusic },
+  { name: "Headphones", icon: faHeadphones },
+  { name: "Microphone", icon: faMicrophone },
+  { name: "Camera", icon: faCamera },
+  { name: "Film", icon: faFilm },
+  { name: "Video", icon: faVideo },
+  // Nature
+  { name: "Sun", icon: faSun },
+  { name: "Moon", icon: faMoon },
+  { name: "Star", icon: faStar },
+  { name: "Leaf", icon: faLeaf },
+  { name: "Tree", icon: faTree },
+  { name: "Seedling", icon: faSeedling },
+  { name: "Fire", icon: faFire },
+  { name: "Bolt", icon: faBolt },
+  { name: "Snowflake", icon: faSnowflake },
+  { name: "Rainbow", icon: faRainbow },
+  { name: "Cloud Rain", icon: faCloudRain },
+  // Objects & Tools
+  { name: "Toolbox", icon: faToolbox },
+  { name: "Wrench", icon: faWrench },
+  { name: "Hammer", icon: faHammer },
+  { name: "Lock", icon: faLock },
+  { name: "Key", icon: faKey },
+  { name: "Shield", icon: faShieldHalved },
+  { name: "Bell", icon: faBell },
+  { name: "Bookmark", icon: faBookmark },
+  { name: "Tag", icon: faTag },
+  { name: "Paper Plane", icon: faPaperPlane },
+  { name: "Envelope", icon: faEnvelope },
+  { name: "Phone", icon: faPhone },
+  { name: "Map Pin", icon: faMapPin },
+  { name: "Compass", icon: faCompass },
+  { name: "Link", icon: faLink },
+  { name: "Share", icon: faShareNodes },
+  // Fun & Social
+  { name: "Heart", icon: faHeart },
+  { name: "Trophy", icon: faTrophy },
+  { name: "Medal", icon: faMedal },
+  { name: "Crown", icon: faCrown },
+  { name: "Gift", icon: faGift },
+  { name: "Rocket", icon: faRocket },
+  { name: "Diamond", icon: faGem },
+  { name: "Gamepad", icon: faGamepad },
+  { name: "Dice", icon: faDice },
+  { name: "Thumbs Up", icon: faThumbsUp },
+  { name: "Face Smile", icon: faFaceSmile },
+  // Science
+  { name: "Atom", icon: faAtom },
+  { name: "DNA", icon: faDna },
+  { name: "Microscope", icon: faMicroscope },
+  { name: "Flask", icon: faFlask },
+  { name: "Stethoscope", icon: faStethoscope },
+  { name: "Brain", icon: faBrain },
+  { name: "Eye", icon: faEye },
+  // Transport & Places
+  { name: "Car", icon: faCar },
+  { name: "Plane", icon: faPlane },
+  { name: "Bicycle", icon: faBicycle },
+  { name: "Ship", icon: faShip },
+  { name: "Train", icon: faTrain },
+  { name: "House", icon: faHouse },
+  { name: "Building", icon: faBuilding },
+  { name: "School", icon: faSchool },
+  { name: "Store", icon: faStore },
+  { name: "Hospital", icon: faHospital },
+  // Data
+  { name: "Bar Chart", icon: faChartBar },
+  { name: "Pie Chart", icon: faChartPie },
+  { name: "Line Chart", icon: faChartLine },
+  { name: "Table", icon: faTable },
+  { name: "Search", icon: faMagnifyingGlass },
 ]
 
 const GRADIENTS = [
+  { id: "green-teal", label: "Toolbox", from: "#7ed957", to: "#0d9488" },
   { id: "violet-indigo", label: "Violet", from: "#7c3aed", to: "#4338ca" },
   { id: "rose-pink", label: "Rose", from: "#f43f5e", to: "#db2777" },
   { id: "cyan-blue", label: "Cyan", from: "#06b6d4", to: "#2563eb" },
   { id: "amber-orange", label: "Amber", from: "#f59e0b", to: "#ea580c" },
   { id: "emerald-teal", label: "Emerald", from: "#10b981", to: "#0d9488" },
-  { id: "fuchsia-purple", label: "Fuchsia", from: "#d946ef", to: "#9333ea" },
-  { id: "lime-green", label: "Lime", from: "#84cc16", to: "#16a34a" },
+  { id: "fuchsia", label: "Fuchsia", from: "#d946ef", to: "#9333ea" },
   { id: "slate", label: "Slate", from: "#475569", to: "#1e293b" },
 ]
 
-const BG_SHAPES = ["rounded-2xl", "rounded-full", "rounded-xl", "rounded-none"]
+const BG_SHAPES = [
+  { id: "rounded-2xl", label: "Rounded" },
+  { id: "rounded-full", label: "Circle" },
+  { id: "rounded-none", label: "Square" },
+]
+
 const SIZES = [64, 96, 128, 192]
 
 export function IconCreator() {
   const [search, setSearch] = useState("")
-  const [selectedIcon, setSelectedIcon] = useState("Rocket")
+  const [selected, setSelected] = useState<FAIcon>(FA_ICONS[0])
   const [gradient, setGradient] = useState(GRADIENTS[0])
   const [bgShape, setBgShape] = useState("rounded-2xl")
   const [iconSize, setIconSize] = useState(96)
   const [iconColor, setIconColor] = useState("#ffffff")
-  const [strokeWidth, setStrokeWidth] = useState(1.5)
   const [copied, setCopied] = useState(false)
   const [exportOpen, setExportOpen] = useState(false)
-  const previewRef = useRef<HTMLDivElement>(null)
 
-  const filteredIcons = ICON_NAMES.filter((n) =>
-    n.toLowerCase().includes(search.toLowerCase())
+  const filtered = FA_ICONS.filter((ic) =>
+    ic.name.toLowerCase().includes(search.toLowerCase())
   )
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const IconComponent = (LucideIcons as any)[selectedIcon] as React.ElementType | undefined
-
-  const previewSize = iconSize
-  const containerSize = Math.round(previewSize * 1.6)
-  const iconRenderSize = Math.round(previewSize * 0.5)
-
-  const rx = bgShape === "rounded-full" ? containerSize / 2 : bgShape === "rounded-none" ? 0 : bgShape === "rounded-2xl" ? 24 : 16
+  const containerSize = Math.round(iconSize * 1.6)
+  const iconRenderSize = Math.round(iconSize * 0.5)
+  const rx = bgShape === "rounded-full" ? containerSize / 2
+    : bgShape === "rounded-none" ? 0
+      : bgShape === "rounded-2xl" ? 24 : 16
 
   const buildSvgString = () => {
-    const half = containerSize / 2
-    const iconR = iconRenderSize / 2
+    // Build an SVG from the icon's path data directly
+    const iconDef = selected.icon
+    const [w, h, , , pathData] = iconDef.icon
+    const path = Array.isArray(pathData) ? pathData.join(" ") : pathData
+    const pad = Math.round(containerSize * 0.22)
+    const iconW = containerSize - pad * 2
+    const iconH = containerSize - pad * 2
     return `<svg xmlns="http://www.w3.org/2000/svg" width="${containerSize}" height="${containerSize}" viewBox="0 0 ${containerSize} ${containerSize}">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -73,6 +194,11 @@ export function IconCreator() {
     </linearGradient>
   </defs>
   <rect width="${containerSize}" height="${containerSize}" rx="${rx}" fill="url(#bg)"/>
+  <g transform="translate(${pad}, ${pad})">
+    <svg width="${iconW}" height="${iconH}" viewBox="0 0 ${w} ${h}">
+      <path d="${path}" fill="${iconColor}"/>
+    </svg>
+  </g>
 </svg>`
   }
 
@@ -87,60 +213,51 @@ export function IconCreator() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = `icon-${selectedIcon.toLowerCase()}.svg`
+    a.download = `icon-${selected.name.toLowerCase().replace(/\s+/g, "-")}.svg`
     a.click()
     URL.revokeObjectURL(url)
     setExportOpen(false)
   }
 
   const exportAsPng = () => {
-    const canvas = document.createElement("canvas")
-    canvas.width = containerSize
-    canvas.height = containerSize
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
-    const grad = ctx.createLinearGradient(0, 0, containerSize, containerSize)
-    grad.addColorStop(0, gradient.from)
-    grad.addColorStop(1, gradient.to)
-    ctx.fillStyle = grad
-    if (rx > 0) {
-      ctx.beginPath()
-      ctx.roundRect(0, 0, containerSize, containerSize, rx)
-      ctx.fill()
-    } else {
-      ctx.fillRect(0, 0, containerSize, containerSize)
+    const svgStr = buildSvgString()
+    const img = new Image()
+    img.crossOrigin = "anonymous"
+    img.onload = () => {
+      const canvas = document.createElement("canvas")
+      canvas.width = containerSize * 2
+      canvas.height = containerSize * 2
+      const ctx = canvas.getContext("2d")!
+      ctx.scale(2, 2)
+      ctx.drawImage(img, 0, 0)
+      canvas.toBlob((blob) => {
+        if (!blob) return
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = `icon-${selected.name.toLowerCase().replace(/\s+/g, "-")}.png`
+        a.click()
+        URL.revokeObjectURL(url)
+      })
     }
-    canvas.toBlob((blob) => {
-      if (!blob) return
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url
-      a.download = `icon-${selectedIcon.toLowerCase()}.png`
-      a.click()
-      URL.revokeObjectURL(url)
-    })
+    img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}`
     setExportOpen(false)
   }
 
   return (
     <div className="flex flex-col gap-6 h-full">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold text-foreground">Icon Creator</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Pick an icon, style it with gradients and export</p>
+          <p className="text-sm text-muted-foreground mt-0.5">Pick an icon, style it, and export as PNG or SVG</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={handleCopySvg} className="gap-2">
-            {copied ? <Check className="w-3.5 h-3.5 text-tool-icon" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
             {copied ? "Copied!" : "Copy SVG"}
           </Button>
           <div className="relative">
-            <Button
-              size="sm"
-              onClick={() => setExportOpen((o) => !o)}
-              className="gap-1.5 bg-tool-icon text-white hover:bg-tool-icon/90"
-            >
+            <Button size="sm" onClick={() => setExportOpen((o) => !o)} className="gap-1.5 bg-tool-icon text-white hover:bg-tool-icon/90">
               <Download className="w-3.5 h-3.5" />
               Export
               <ChevronDown className="w-3 h-3" />
@@ -156,8 +273,8 @@ export function IconCreator() {
       </div>
 
       <div className="flex gap-5 flex-1 min-h-0">
-        {/* Left: Controls */}
-        <div className="flex flex-col gap-5 w-56 shrink-0 overflow-y-auto">
+        {/* Controls */}
+        <div className="flex flex-col gap-5 w-56 shrink-0 overflow-y-auto pr-1">
           {/* Gradient */}
           <div className="flex flex-col gap-2">
             <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Gradient</label>
@@ -170,12 +287,10 @@ export function IconCreator() {
                   className={cn(
                     "h-8 rounded-lg transition-all",
                     gradient.id === g.id
-                      ? "ring-2 ring-foreground ring-offset-1 ring-offset-background"
+                      ? "ring-2 ring-foreground ring-offset-1 ring-offset-background scale-105"
                       : "opacity-60 hover:opacity-100"
                   )}
-                  style={{
-                    background: `linear-gradient(135deg, ${g.from}, ${g.to})`,
-                  }}
+                  style={{ background: `linear-gradient(135deg, ${g.from}, ${g.to})` }}
                 />
               ))}
             </div>
@@ -187,35 +302,40 @@ export function IconCreator() {
             <div className="grid grid-cols-4 gap-1.5">
               {BG_SHAPES.map((shape) => (
                 <button
-                  key={shape}
-                  onClick={() => setBgShape(shape)}
+                  key={shape.id}
+                  onClick={() => setBgShape(shape.id)}
+                  title={shape.label}
                   className={cn(
-                    "h-8 w-8 border border-border transition-all flex items-center justify-center",
-                    shape,
-                    bgShape === shape
-                      ? "bg-accent border-primary/50"
-                      : "bg-secondary hover:bg-accent"
+                    "h-8 w-full border transition-all flex items-center justify-center",
+                    shape.id,
+                    bgShape === shape.id
+                      ? "bg-primary/10 border-primary/50 text-foreground"
+                      : "bg-secondary border-border text-muted-foreground hover:bg-accent"
                   )}
-                />
+                >
+                  <span className={cn(
+                    "w-4 h-4 block",
+                    shape.id,
+                    bgShape === shape.id ? "bg-primary" : "bg-muted-foreground/40"
+                  )} />
+                </button>
               ))}
             </div>
           </div>
 
           {/* Size */}
           <div className="flex flex-col gap-2">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Size — {iconSize}px
-            </label>
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Size</label>
             <div className="flex gap-1">
               {SIZES.map((s) => (
                 <button
                   key={s}
                   onClick={() => setIconSize(s)}
                   className={cn(
-                    "flex-1 py-1.5 rounded-md text-xs font-mono transition-all",
+                    "flex-1 py-1.5 rounded-md text-xs font-mono transition-all border",
                     iconSize === s
-                      ? "bg-tool-icon/20 text-tool-icon border border-tool-icon/40"
-                      : "bg-secondary text-muted-foreground hover:bg-accent border border-transparent"
+                      ? "bg-primary/10 text-primary border-primary/40"
+                      : "bg-secondary text-muted-foreground hover:bg-accent border-transparent"
                   )}
                 >
                   {s}
@@ -228,88 +348,63 @@ export function IconCreator() {
           <div className="flex flex-col gap-2">
             <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Icon Color</label>
             <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={iconColor}
-                onChange={(e) => setIconColor(e.target.value)}
-                className="w-9 h-9 rounded-lg border border-border cursor-pointer bg-secondary"
-              />
+              <label className="w-9 h-9 rounded-lg border border-border cursor-pointer overflow-hidden shrink-0 block relative">
+                <input
+                  type="color"
+                  value={iconColor}
+                  onChange={(e) => setIconColor(e.target.value)}
+                  className="absolute opacity-0 cursor-pointer"
+                  style={{ width: "200%", height: "200%", top: "-50%", left: "-50%" }}
+                />
+                <span className="block w-full h-full" style={{ background: iconColor }} />
+              </label>
               <span className="font-mono text-sm text-muted-foreground">{iconColor.toUpperCase()}</span>
             </div>
           </div>
-
-          {/* Stroke */}
-          <div className="flex flex-col gap-2">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Stroke — {strokeWidth}
-            </label>
-            <input
-              type="range"
-              min={1}
-              max={3}
-              step={0.25}
-              value={strokeWidth}
-              onChange={(e) => setStrokeWidth(Number(e.target.value))}
-              className="w-full accent-[var(--tool-icon)]"
-            />
-          </div>
         </div>
 
-        {/* Center: Preview */}
-        <div className="flex-1 flex items-center justify-center rounded-xl bg-secondary/50 border border-border">
-          {IconComponent ? (
-            <div
-              className={cn("flex items-center justify-center shadow-2xl", bgShape)}
-              style={{
-                width: containerSize,
-                height: containerSize,
-                background: `linear-gradient(135deg, ${gradient.from}, ${gradient.to})`,
-              }}
-            >
-              <IconComponent
-                width={iconRenderSize}
-                height={iconRenderSize}
-                color={iconColor}
-                strokeWidth={strokeWidth}
-              />
-            </div>
-          ) : (
-            <p className="text-muted-foreground text-sm">Select an icon</p>
-          )}
-        </div>
-
-        {/* Right: Icon picker */}
-        <div className="flex flex-col gap-3 w-52 shrink-0">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-            <Input
-              placeholder="Search icons..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-8 text-sm bg-secondary border-border h-8"
+        {/* Preview */}
+        <div className="flex-1 flex flex-col items-center justify-center gap-4 rounded-xl bg-secondary/50 border border-border">
+          <div
+            className={cn("flex items-center justify-center shadow-2xl transition-all", bgShape)}
+            style={{
+              width: containerSize,
+              height: containerSize,
+              background: `linear-gradient(135deg, ${gradient.from}, ${gradient.to})`,
+            }}
+          >
+            <FontAwesomeIcon
+              icon={selected.icon}
+              style={{ width: iconRenderSize, height: iconRenderSize, color: iconColor }}
             />
           </div>
+          <p className="text-xs text-muted-foreground font-mono">{selected.name}</p>
+        </div>
+
+        {/* Icon Picker */}
+        <div className="flex flex-col gap-3 w-56 shrink-0">
+          <Input
+            placeholder="Search icons..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="text-sm bg-secondary border-border h-8"
+          />
           <div className="grid grid-cols-5 gap-1 overflow-y-auto flex-1 content-start">
-            {filteredIcons.map((name) => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const Icon = (LucideIcons as any)[name] as React.ElementType | undefined
-              if (!Icon) return null
-              return (
-                <button
-                  key={name}
-                  onClick={() => setSelectedIcon(name)}
-                  title={name}
-                  className={cn(
-                    "flex items-center justify-center w-full aspect-square rounded-lg transition-all",
-                    selectedIcon === name
-                      ? "bg-tool-icon/20 text-tool-icon border border-tool-icon/40"
-                      : "text-muted-foreground hover:bg-accent hover:text-foreground border border-transparent"
-                  )}
-                >
-                  <Icon className="w-4 h-4" />
-                </button>
-              )
-            })}
+            {filtered.map((ic) => (
+              <button
+                key={ic.name}
+                onClick={() => setSelected(ic)}
+                title={ic.name}
+                className={cn(
+                  "flex items-center justify-center w-full aspect-square rounded-lg transition-all border",
+                  selected.name === ic.name
+                    ? "bg-primary/10 text-primary border-primary/40"
+                    : "text-muted-foreground hover:bg-accent hover:text-foreground border-transparent"
+                )}
+              >
+                <FontAwesomeIcon icon={ic.icon} className="w-4 h-4" />
+              </button>
+            ))}
           </div>
         </div>
       </div>

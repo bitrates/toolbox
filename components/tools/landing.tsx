@@ -207,12 +207,9 @@ export function Landing({ onSelect }: LandingProps) {
       {/* Stats strip */}
       <div className="flex items-center gap-10 flex-wrap border-t border-border pt-8 pb-4">
         {[
-          { value: "", label: "" },
-          { value: "", label: "" },
-          { value: "", label: "" },
-          { value: "", label: "" },
-        ].map((stat) => (
-          <div key={stat.label} className="flex flex-col gap-0.5">
+          { value: "Built By", label: "Bitrates" },
+        ].map((stat, i) => (
+          <div key={i} className="flex flex-col gap-0.5">
             <span className="text-2xl font-bold text-foreground">{stat.value}</span>
             <span className="text-xs text-muted-foreground uppercase tracking-wider">{stat.label}</span>
           </div>

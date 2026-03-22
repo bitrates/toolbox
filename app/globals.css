@@ -11,9 +11,9 @@
   --card-foreground: oklch(0.15 0.015 260);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.15 0.015 260);
-  /* Vivid violet primary */
-  --primary: oklch(0.58 0.28 295);
-  --primary-foreground: oklch(0.99 0 0);
+  /* Toolbox green — rgb(126, 217, 87) */
+  --primary: oklch(0.80 0.20 130);
+  --primary-foreground: oklch(0.15 0.05 130);
   --secondary: oklch(0.95 0.005 260);
   --secondary-foreground: oklch(0.2 0.015 260);
   --muted: oklch(0.95 0.005 260);
@@ -24,7 +24,7 @@
   --destructive-foreground: oklch(0.99 0 0);
   --border: oklch(0.88 0.008 260);
   --input: oklch(0.93 0.006 260);
-  --ring: oklch(0.58 0.28 295);
+  --ring: oklch(0.80 0.20 130);
   /* Tool accent colors — bold and saturated */
   --tool-code: oklch(0.55 0.22 160);
   --tool-palette: oklch(0.60 0.22 25);
@@ -34,13 +34,13 @@
   --radius: 0.75rem;
   --sidebar: oklch(0.985 0.004 260);
   --sidebar-foreground: oklch(0.15 0.015 260);
-  --sidebar-primary: oklch(0.58 0.28 295);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-primary: oklch(0.80 0.20 130);
+  --sidebar-primary-foreground: oklch(0.15 0.05 130);
   --sidebar-accent: oklch(0.93 0.008 260);
   --sidebar-accent-foreground: oklch(0.15 0.015 260);
   --sidebar-border: oklch(0.88 0.008 260);
-  --sidebar-ring: oklch(0.58 0.28 295);
-  --chart-1: oklch(0.58 0.28 295);
+  --sidebar-ring: oklch(0.80 0.20 130);
+  --chart-1: oklch(0.80 0.20 130);
   --chart-2: oklch(0.55 0.22 160);
   --chart-3: oklch(0.60 0.22 25);
   --chart-4: oklch(0.55 0.22 230);

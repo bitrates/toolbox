@@ -278,8 +278,16 @@ export function NoiseMesh() {
             <div className="flex flex-col gap-2">
               {colors.map((c, i) => (
                 <div key={i} className="flex items-center gap-2">
-                  <input type="color" value={c} onChange={(e) => updateColor(i, e.target.value)}
-                    className="w-9 h-9 rounded-lg border border-border cursor-pointer" />
+                  <label className="w-9 h-9 rounded-lg border border-border cursor-pointer overflow-hidden shrink-0 block relative">
+                    <input
+                      type="color"
+                      value={c}
+                      onChange={(e) => updateColor(i, e.target.value)}
+                      className="absolute opacity-0 cursor-pointer"
+                      style={{ width: "200%", height: "200%", top: "-50%", left: "-50%" }}
+                    />
+                    <span className="block w-full h-full" style={{ background: c }} />
+                  </label>
                   <span className="font-mono text-sm text-foreground flex-1">{c.toUpperCase()}</span>
                   <button onClick={() => removeColor(i)} disabled={colors.length <= 2}
                     className="text-muted-foreground text-xs hover:text-destructive disabled:opacity-20">✕</button>

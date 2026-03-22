@@ -241,8 +241,16 @@ export function WavyLines() {
               { label: "Background", value: bgColor, set: setBgColor },
             ].map(({ label, value, set }) => (
               <div key={label} className="flex items-center gap-3">
-                <input type="color" value={value} onChange={(e) => set(e.target.value)}
-                  className="w-9 h-9 rounded-lg border border-border cursor-pointer" />
+                <label className="w-9 h-9 rounded-lg border border-border cursor-pointer overflow-hidden shrink-0 block relative">
+                  <input
+                    type="color"
+                    value={value}
+                    onChange={(e) => set(e.target.value)}
+                    className="absolute opacity-0 cursor-pointer"
+                    style={{ width: "200%", height: "200%", top: "-50%", left: "-50%" }}
+                  />
+                  <span className="block w-full h-full" style={{ background: value }} />
+                </label>
                 <div>
                   <p className="text-xs text-muted-foreground">{label}</p>
                   <p className="font-mono text-sm text-foreground">{value.toUpperCase()}</p>

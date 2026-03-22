@@ -1,9 +1,8 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useCallback, useEffect } from "react"
 import { Download, Copy, Check, RefreshCw, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 
 const BACKGROUNDS = [
@@ -39,16 +38,49 @@ const DEFAULT_CODE = `function greet(name) {
 greet("World")`
 
 function syntaxHighlight(code: string, theme: typeof THEMES[0]) {
-  const escaped = code
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
+  return code.split("\n").map((line) => {
+    let l = line
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
 
-  return escaped
-    .replace(/(\/\/.*)/g, `<span style="color:${theme.comment}">$1</span>`)
-    .replace(/\b(function|return|const|let|var|if|else|for|while|class|import|export|default|new|async|await|typeof|null|undefined|true|false)\b/g, `<span style="color:${theme.keyword}">$1</span>`)
-    .replace(/(`[^`]*`|"[^"]*"|'[^']*')/g, `<span style="color:${theme.string}">$1</span>`)
-    .replace(/\b(\d+)\b/g, `<span style="color:${theme.number}">$1</span>`)
+    if (/^\s*(\/\/.*)/.test(l)) {
+      return l.replace(/(\/\/.*)/, `<span style="color:${theme.comment}">$1</span>`)
+    }
+
+    const stringSlots: string[] = []
+    l = l.replace(/(`[^`]*`|"[^"]*"|'[^']*')/g, (m) => {
+      stringSlots.push(`<span style="color:${theme.string}">${m}</span>`)
+      return `\x00STR${stringSlots.length - 1}\x00`
+    })
+
+    l = l.replace(
+      /\b(function|return|const|let|var|if|else|for|while|class|import|export|default|new|async|await|typeof|null|undefined|true|false)\b/g,
+      `<span style="color:${theme.keyword}">$1</span>`
+    )
+
+    l = l.replace(/\b(\d+)\b/g, `<span style="color:${theme.number}">$1</span>`)
+    l = l.replace(/\x00STR(\d+)\x00/g, (_, i) => stringSlots[Number(i)])
+
+    return l
+  }).join("\n")
+}
+
+// Extract plain text from a contentEditable element, preserving newlines
+function getPlainText(el: HTMLElement): string {
+  const lines: string[] = []
+  el.childNodes.forEach((node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      lines.push(node.textContent ?? "")
+    } else if ((node as HTMLElement).tagName === "DIV" || (node as HTMLElement).tagName === "P") {
+      lines.push((node as HTMLElement).innerText ?? "")
+    } else if ((node as HTMLElement).tagName === "BR") {
+      lines.push("")
+    } else {
+      lines.push((node as HTMLElement).innerText ?? node.textContent ?? "")
+    }
+  })
+  return lines.join("\n")
 }
 
 export function CodeBeautifier() {
@@ -56,9 +88,44 @@ export function CodeBeautifier() {
   const [bg, setBg] = useState(BACKGROUNDS[0])
   const [theme, setTheme] = useState(THEMES[0])
   const [padding, setPadding] = useState(48)
+  const [filename, setFilename] = useState("snippet.js")
   const [copied, setCopied] = useState(false)
   const [exportOpen, setExportOpen] = useState(false)
-  const previewRef = useRef<HTMLDivElement>(null)
+  const codeRef = useRef<HTMLPreElement>(null)
+  const isComposing = useRef(false)
+
+  // Keep caret position across re-renders by not overwriting innerHTML while user is typing
+  const highlighted = syntaxHighlight(code, theme)
+
+  // On theme change, force refresh innerHTML (safe, user not actively editing)
+  const lastThemeId = useRef(theme.id)
+  useEffect(() => {
+    if (lastThemeId.current !== theme.id && codeRef.current) {
+      codeRef.current.innerHTML = highlighted
+      lastThemeId.current = theme.id
+    }
+  }, [theme.id, highlighted])
+
+  // Initialize innerHTML on mount
+  useEffect(() => {
+    if (codeRef.current) {
+      codeRef.current.innerHTML = highlighted
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const handleInput = useCallback(() => {
+    if (isComposing.current || !codeRef.current) return
+    const plain = getPlainText(codeRef.current)
+    setCode(plain)
+  }, [])
+
+  const handleReset = () => {
+    setCode(DEFAULT_CODE)
+    if (codeRef.current) {
+      codeRef.current.innerHTML = syntaxHighlight(DEFAULT_CODE, theme)
+    }
+  }
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(code)
@@ -78,12 +145,12 @@ export function CodeBeautifier() {
     const totalW = codeW + padding * 2
     const totalH = codeH + chromH + padding * 2
 
-    const escapedLines = lines.map((l) =>
-      l.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    )
-    const textEls = escapedLines.map((l, i) =>
-      `<text x="20" y="${chromH + 20 + i * lineHeight}" font-family="'Geist Mono', 'Fira Code', monospace" font-size="${fontSize}" fill="${theme.text}" xml:space="preserve">${l}</text>`
-    ).join("\n    ")
+    const codeStartX = padding + 20
+    const codeStartY = padding + chromH + 20
+    const textEls = lines.map((l, i) => {
+      const escaped = l.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      return `<text x="${codeStartX}" y="${codeStartY + i * lineHeight}" font-family="'Geist Mono', 'Fira Code', monospace" font-size="${fontSize}" fill="${theme.text}" xml:space="preserve">${escaped}</text>`
+    }).join("\n    ")
 
     return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${totalH}">
   <defs>
@@ -91,31 +158,20 @@ export function CodeBeautifier() {
       <stop offset="0%" stop-color="${bg.from}"/>
       <stop offset="100%" stop-color="${bg.to}"/>
     </linearGradient>
-    <clipPath id="windowClip">
-      <rect x="${padding}" y="${padding}" width="${codeW}" height="${codeH + chromH}" rx="12"/>
-    </clipPath>
   </defs>
   <rect width="${totalW}" height="${totalH}" fill="url(#outerBg)" rx="20"/>
   <rect x="${padding}" y="${padding}" width="${codeW}" height="${codeH + chromH}" rx="12" fill="${theme.bg}"/>
-  <!-- Title bar -->
-  <rect x="${padding}" y="${padding}" width="${codeW}" height="${chromH}" fill="${theme.bg}" rx="12"/>
-  <rect x="${padding}" y="${padding + chromH - 12}" width="${codeW}" height="12" fill="${theme.bg}"/>
-  <!-- Traffic lights -->
+  <rect x="${padding}" y="${padding + chromH - 1}" width="${codeW}" height="1" fill="${theme.text}" opacity="0.08"/>
   <circle cx="${padding + 16}" cy="${padding + 20}" r="5" fill="#ef4444" opacity="0.85"/>
   <circle cx="${padding + 32}" cy="${padding + 20}" r="5" fill="#eab308" opacity="0.85"/>
   <circle cx="${padding + 48}" cy="${padding + 20}" r="5" fill="#22c55e" opacity="0.85"/>
-  <!-- Filename -->
-  <text x="${padding + codeW / 2}" y="${padding + 24}" text-anchor="middle" font-family="monospace" font-size="11" fill="${theme.text}" opacity="0.35">snippet.js</text>
-  <!-- Code -->
-  <g transform="translate(${padding + 4}, ${padding})" clip-path="url(#windowClip)">
-    ${textEls}
-  </g>
+  <text x="${padding + codeW / 2}" y="${padding + 25}" text-anchor="middle" font-family="monospace" font-size="12" fill="${theme.text}" opacity="0.4">${filename.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</text>
+  ${textEls}
 </svg>`
   }
 
   const exportAsSvg = () => {
-    const svg = buildSvg()
-    const blob = new Blob([svg], { type: "image/svg+xml" })
+    const blob = new Blob([buildSvg()], { type: "image/svg+xml" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
@@ -128,12 +184,10 @@ export function CodeBeautifier() {
   const exportAsPng = () => {
     const svg = buildSvg()
     const scale = 2
-    // Parse dimensions from SVG
     const wMatch = svg.match(/width="(\d+)"/)
     const hMatch = svg.match(/height="(\d+)"/)
     const w = wMatch ? parseInt(wMatch[1]) * scale : 800
     const h = hMatch ? parseInt(hMatch[1]) * scale : 600
-
     const img = new Image()
     img.crossOrigin = "anonymous"
     const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" })
@@ -167,12 +221,15 @@ export function CodeBeautifier() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold text-foreground">Code Beautifier</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Style your code snippets with beautiful backgrounds</p>
+          <p className="text-sm text-muted-foreground mt-0.5">Click directly on the code preview to edit</p>
         </div>
         <div className="flex gap-2">
           <Button variant="secondary" size="sm" onClick={handleCopy} className="gap-2">
             {copied ? <Check className="w-3.5 h-3.5 text-tool-code" /> : <Copy className="w-3.5 h-3.5" />}
             {copied ? "Copied!" : "Copy Code"}
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handleReset} className="gap-1.5 text-muted-foreground">
+            <RefreshCw className="w-3.5 h-3.5" />
           </Button>
           <div className="relative">
             <Button
@@ -197,26 +254,6 @@ export function CodeBeautifier() {
       <div className="flex gap-5 flex-1 min-h-0">
         {/* Controls */}
         <div className="flex flex-col gap-5 w-56 shrink-0 overflow-y-auto pr-1">
-          {/* Code Input */}
-          <div className="flex flex-col gap-2">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Code</label>
-            <Textarea
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              className="font-mono text-xs resize-none h-36 bg-secondary border-border"
-              placeholder="Paste your code here..."
-            />
-            <Button
-              variant="ghost"
-              size="sm"
-              className="self-start gap-1.5 text-xs text-muted-foreground"
-              onClick={() => setCode(DEFAULT_CODE)}
-            >
-              <RefreshCw className="w-3 h-3" />
-              Reset
-            </Button>
-          </div>
-
           {/* Background */}
           <div className="flex flex-col gap-2">
             <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Background</label>
@@ -273,10 +310,9 @@ export function CodeBeautifier() {
           </div>
         </div>
 
-        {/* Preview */}
+        {/* Preview — click to edit directly */}
         <div className="flex-1 flex items-center justify-center rounded-xl bg-secondary/60 border border-border overflow-auto">
           <div
-            ref={previewRef}
             className={cn("rounded-2xl shadow-2xl", bg.class)}
             style={{ padding, margin: 24 }}
           >
@@ -286,16 +322,38 @@ export function CodeBeautifier() {
                 className="flex items-center gap-2 px-4 py-3"
                 style={{ background: theme.bg, borderBottom: "1px solid rgba(128,128,128,0.12)" }}
               >
-                <span className="w-3 h-3 rounded-full bg-red-500/80" />
-                <span className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                <span className="w-3 h-3 rounded-full bg-green-500/80" />
-                <span className="mx-auto text-xs opacity-30 font-mono" style={{ color: theme.text }}>snippet.js</span>
+                <span className="w-3 h-3 rounded-full bg-red-500/80 shrink-0" />
+                <span className="w-3 h-3 rounded-full bg-yellow-500/80 shrink-0" />
+                <span className="w-3 h-3 rounded-full bg-green-500/80 shrink-0" />
+                <input
+                  value={filename}
+                  onChange={(e) => setFilename(e.target.value)}
+                  className="mx-auto text-xs font-mono bg-transparent border-none outline-none text-center w-32 opacity-40 hover:opacity-70 focus:opacity-90 transition-opacity"
+                  style={{ color: theme.text }}
+                  spellCheck={false}
+                />
               </div>
-              {/* Code */}
+              {/* Editable code — contentEditable with syntax highlighting */}
               <pre
-                className="p-5 text-sm leading-relaxed overflow-x-auto font-mono"
-                style={{ background: theme.bg, color: theme.text, margin: 0 }}
-                dangerouslySetInnerHTML={{ __html: syntaxHighlight(code, theme) }}
+                ref={codeRef}
+                contentEditable
+                suppressContentEditableWarning
+                onInput={handleInput}
+                onCompositionStart={() => { isComposing.current = true }}
+                onCompositionEnd={() => {
+                  isComposing.current = false
+                  handleInput()
+                }}
+                onKeyDown={(e) => {
+                  // Allow Tab to insert spaces instead of losing focus
+                  if (e.key === "Tab") {
+                    e.preventDefault()
+                    document.execCommand("insertText", false, "  ")
+                  }
+                }}
+                spellCheck={false}
+                className="p-5 text-sm leading-relaxed overflow-x-auto font-mono focus:outline-none cursor-text"
+                style={{ background: theme.bg, color: theme.text, margin: 0, whiteSpace: "pre", minWidth: 320 }}
               />
             </div>
           </div>
